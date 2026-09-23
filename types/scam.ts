@@ -28,7 +28,15 @@ export type RedFlagType =
   | 'PROCESSING_FEE'
   | 'VERIFICATION_FEE'
   | 'SECURITY_DEPOSIT'
-  | 'EMOTIONAL_MANIPULATION';
+  | 'EMOTIONAL_MANIPULATION'
+  | 'IP_BASED_URL'
+  | 'URL_SHORTENER'
+  | 'SUSPICIOUS_SUBDOMAIN'
+  | 'TYPOSQUATTING'
+  | 'EXCESSIVE_URL_PARAMETERS'
+  | 'INSECURE_HTTP'
+  | 'SUSPICIOUS_TLD'
+  | 'DANGEROUS_FILE_EXTENSION';
 
 export interface RedFlag {
   id: string;
@@ -37,6 +45,25 @@ export interface RedFlag {
   description: string;
   severity: 'low' | 'medium' | 'high';
   evidence?: string[];
+}
+
+export interface UrlAnalysisDetails {
+  rawUrl: string;
+  normalizedUrl: string;
+  domain: string;
+  hostname: string;
+  protocol: string;
+  pathname: string;
+  searchParamsCount: number;
+  isHttps: boolean;
+  isIpAddress: boolean;
+  isShortener: boolean;
+  hasSuspiciousSubdomains: boolean;
+  hasExcessiveParams: boolean;
+  isTyposquatting: boolean;
+  hasSuspiciousTld: boolean;
+  statusLabel: 'Suspicious' | 'Needs Caution' | 'No obvious red flags detected';
+  keySignals: string[];
 }
 
 export interface AnalysisResult {
@@ -52,9 +79,10 @@ export interface AnalysisResult {
   avoidActions: string[];
   analyzedText: string;
   analyzedAt: string;
-  inputType?: 'text' | 'screenshot';
+  inputType?: 'text' | 'screenshot' | 'url';
   screenshotUrl?: string;
   detectedUrls?: string[];
+  urlDetails?: UrlAnalysisDetails;
 }
 
 export interface OCRResult {

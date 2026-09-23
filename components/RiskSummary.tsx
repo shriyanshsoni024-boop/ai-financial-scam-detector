@@ -1,6 +1,5 @@
 import { AnalysisResult } from '@/types/scam';
 import RiskBadge from './RiskBadge';
-import { Clock } from 'lucide-react';
 
 interface RiskSummaryProps {
   result: AnalysisResult;
@@ -10,11 +9,11 @@ export default function RiskSummary({ result }: RiskSummaryProps) {
   const getRiskBorderColor = () => {
     switch (result.riskLevel) {
       case 'HIGH_RISK':
-        return 'border-red-500/50';
+        return 'border-red-500/30';
       case 'NEEDS_CAUTION':
-        return 'border-amber-500/50';
+        return 'border-amber-500/30';
       case 'LOW_CONCERN':
-        return 'border-[#b6ff00]/50';
+        return 'border-[#b6ff00]/30';
     }
   };
 
@@ -29,74 +28,35 @@ export default function RiskSummary({ result }: RiskSummaryProps) {
     }
   };
 
-  // Limit explanation to top 2 critical takeaways for clean editorial layout
-  const visibleExplanation = result.explanation.slice(0, 2);
-
   return (
-    <div className={`p-6 sm:p-7 bg-[#111111] border ${getRiskBorderColor()} space-y-5 font-mono`}>
+    <div className={`p-6 sm:p-7 rounded-xl bg-[#0e0e0e] border ${getRiskBorderColor()} space-y-5`}>
       {/* Assessment Header */}
-      <div className="space-y-3 border-b border-[#292929] pb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-[#b6ff00]" />
-            <span className="text-xs uppercase tracking-widest text-[#888888] font-bold">
-              SECURITY ASSESSMENT
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5 text-[#666666] text-xs">
-            <Clock className="w-3.5 h-3.5" />
-            <span>{new Date(result.analyzedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <RiskBadge level={result.riskLevel} size="lg" />
-          <span className="text-[#3d3d3d]">/</span>
-          <span className="text-base sm:text-lg font-bold text-[#f2f2f2] uppercase tracking-wide">
-            {result.category}
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <RiskBadge level={result.riskLevel} size="md" />
+          <span className="text-xs font-mono text-[#666666]">
+            Score: <strong className="text-[#f2f2f2]">{result.riskScore}/100</strong>
           </span>
         </div>
 
-        <p className="text-xs sm:text-sm text-[#888888] leading-relaxed">
+        <h3 className="text-2xl sm:text-3xl font-extrabold text-[#f2f2f2] tracking-tight">
+          {result.category}
+        </h3>
+
+        <p className="text-sm text-[#a3a3a3] leading-relaxed max-w-2xl font-normal">
           {result.summary}
         </p>
       </div>
 
-      {/* Risk Indicator Score Bar */}
-      <div className="p-4 bg-[#0a0a0a] border border-[#292929] space-y-2">
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-[#f2f2f2] font-bold uppercase tracking-wider">Risk indicator score</span>
-          <span className="text-[#f2f2f2] font-black">{result.riskScore} / 100</span>
-        </div>
-
-        <div className="w-full h-1.5 bg-[#1b1b1b] overflow-hidden">
+      {/* Slim Score Bar */}
+      <div className="space-y-1.5 pt-1">
+        <div className="w-full h-1.5 rounded-full bg-[#1c1c1c] overflow-hidden">
           <div
-            className={`h-full ${getScoreBarColor()} transition-all duration-300`}
+            className={`h-full rounded-full ${getScoreBarColor()} transition-all duration-500`}
             style={{ width: `${Math.max(5, result.riskScore)}%` }}
           />
         </div>
-
-        <p className="text-[10px] text-[#666666] leading-normal">
-          Score reflects detected threat indicators and is not a formal legal guarantee.
-        </p>
       </div>
-
-      {/* Diagnostic Findings */}
-      {visibleExplanation.length > 0 && (
-        <div className="space-y-2 pt-0.5">
-          <h4 className="text-xs uppercase tracking-widest text-[#888888] font-bold">
-            Key Findings
-          </h4>
-          <div className="space-y-1.5">
-            {visibleExplanation.map((item, idx) => (
-              <div key={idx} className="flex items-start gap-2 text-xs text-[#d1d1d1]">
-                <span className="text-[#b6ff00] font-bold">→</span>
-                <span className="leading-relaxed">{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

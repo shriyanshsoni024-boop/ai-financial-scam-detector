@@ -1,5 +1,6 @@
 import { analyzeScam } from '../lib/engine/analyzer';
 import { detectUrlsFromText, validateImageFile } from '../lib/ocr/extractText';
+import { analyzeUrl, validateAndNormalizeUrl } from '../lib/url/urlAnalyzer';
 
 async function runTests() {
   console.log('=== RUNNING AI FINANCIAL SCAM DETECTOR TESTS ===\n');
@@ -94,9 +95,96 @@ async function runTests() {
     process.exit(1);
   }
 
-  console.log(`\nResult: ${passed}/${total} test cases passed.`);
-  if (passed === total) {
-    console.log('🎉 ALL ENGINE & OCR TEST CASES PASSED SUCCESSFULLY!');
+  // Test URL Analyzer
+  console.log('=== TESTING URL HEURISTIC ANALYZER ===\n');
+
+  const urlTestCases = [
+    {
+      name: 'URL Test 1: Typosquatting + Insecure HTTP + Suspicious TLD (.xyz)',
+      url: 'http://sbi-kyc-update.xyz/verify-pan?session=9382&token=abc83719',
+      expectedStatus: 'Suspicious',
+      expectedRisk: 'HIGH_RISK',
+      requiredFlags: ['TYPOSQUATTING', 'INSECURE_HTTP', 'SUSPICIOUS_TLD']
+    },
+    {
+      name: 'URL Test 2: IP-Based Hostname',
+      url: 'http://192.241.144.22/secure-banking/login.php',
+      expectedStatus: 'Suspicious',
+      expectedRisk: 'HIGH_RISK',
+      requiredFlags: ['IP_BASED_URL', 'INSECURE_HTTP']
+    },
+    {
+      name: 'URL Test 3: URL Shortener Service',
+      url: 'https://bit.ly/sbi-urgent-reward',
+      expectedStatus: 'Suspicious',
+      expectedRisk: 'HIGH_RISK',
+      requiredFlags: ['URL_SHORTENER']
+    },
+    {
+      name: 'URL Test 4: Executable Package (.apk)',
+      url: 'https://security-download-hub.net/banking-update.apk',
+      expectedStatus: 'Suspicious',
+      expectedRisk: 'HIGH_RISK',
+      requiredFlags: ['DANGEROUS_FILE_EXTENSION']
+    },
+    {
+      name: 'URL Test 5: Clean Official Banking Domain',
+      url: 'https://www.onlinesbi.sbi/',
+      expectedStatus: 'No obvious red flags detected',
+      expectedRisk: 'LOW_CONCERN',
+      requiredFlags: []
+    }
+  ];
+
+  let urlPassed = 0;
+  for (const utc of urlTestCases) {
+    console.log(`Testing: ${utc.name}`);
+    const res = await analyzeUrl(utc.url);
+    console.log(`- Domain: ${res.urlDetails?.domain}`);
+    console.log(`- Status: ${res.urlDetails?.statusLabel} (Risk: ${res.riskLevel}, Score: ${res.riskScore})`);
+    console.log(`- Flags: ${res.redFlags.map((f) => f.type).join(', ') || 'None'}`);
+
+    let passedCase = true;
+    if (res.urlDetails?.statusLabel !== utc.expectedStatus) {
+      console.error(`  ❌ Status mismatch: expected "${utc.expectedStatus}", got "${res.urlDetails?.statusLabel}"`);
+      passedCase = false;
+    }
+
+    if (res.riskLevel !== utc.expectedRisk) {
+      console.error(`  ❌ Risk level mismatch: expected "${utc.expectedRisk}", got "${res.riskLevel}"`);
+      passedCase = false;
+    }
+
+    for (const rf of utc.requiredFlags) {
+      if (!res.redFlags.some((f) => f.type === rf)) {
+        console.error(`  ❌ Missing required URL flag: ${rf}`);
+        passedCase = false;
+      }
+    }
+
+    if (passedCase) {
+      console.log('  ✅ PASSED\n');
+      urlPassed++;
+    } else {
+      console.log('  ❌ FAILED\n');
+    }
+  }
+
+  // Test URL Validation Utility
+  const invalidVal = validateAndNormalizeUrl('not a valid hostname :::');
+  if (!invalidVal.isValid) {
+    console.log('  ✅ URL INVALID FORMAT REJECTION PASSED\n');
+  } else {
+    console.error('  ❌ URL INVALID FORMAT REJECTION FAILED\n');
+    process.exit(1);
+  }
+
+  console.log(`\nOverall Test Results:`);
+  console.log(`- Text Engine: ${passed}/${total} passed`);
+  console.log(`- URL Engine: ${urlPassed}/${urlTestCases.length} passed`);
+
+  if (passed === total && urlPassed === urlTestCases.length) {
+    console.log('\n🎉 ALL ENGINE, OCR, AND URL ANALYSIS TESTS PASSED SUCCESSFULLY!');
   } else {
     process.exit(1);
   }
@@ -106,3 +194,4 @@ runTests().catch(err => {
   console.error(err);
   process.exit(1);
 });
+

@@ -1,31 +1,30 @@
 import Link from 'next/link';
-import { ExternalLink } from 'lucide-react';
+import { Shield, ExternalLink, PhoneCall } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer id="about" className="w-full border-t border-[#292929] bg-[#050505] text-[#888888] text-xs font-mono">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+    <footer id="about" className="w-full border-t border-white/5 bg-[#050505] text-[#888888] text-xs">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Column 1: Brand & Financial Security */}
-          <div className="space-y-4 md:col-span-2">
-            <div className="flex items-center gap-3">
-              <div className="w-2.5 h-2.5 bg-[#b6ff00] shrink-0" />
-              <span className="font-black text-lg tracking-wider text-[#f2f2f2]">
-                SENTINELSHIELD
+          <div className="space-y-3 md:col-span-2">
+            <div className="flex items-center gap-2.5">
+              <div className="w-6 h-6 rounded-md bg-[#111111] border border-white/10 flex items-center justify-center text-[#b6ff00]">
+                <Shield className="w-3.5 h-3.5 fill-[#b6ff00]/20" />
+              </div>
+              <span className="font-bold text-sm tracking-tight text-[#f2f2f2]">
+                SentinelShield
               </span>
             </div>
-            <p className="text-sm font-bold text-[#f2f2f2] uppercase tracking-widest">
-              Financial Security
-            </p>
-            <p className="text-xs text-[#888888] max-w-md leading-relaxed">
-              Deterministic heuristic threat engine designed to detect financial coercion, fake KYC traps, and payment fraud before credentials or OTPs are compromised.
+            <p className="text-xs text-[#888888] max-w-sm leading-relaxed">
+              Heuristic threat engine designed to detect financial coercion, fake KYC traps, and payment fraud before credentials or funds are compromised.
             </p>
           </div>
 
           {/* Column 2: Navigation */}
-          <div className="space-y-4">
-            <h5 className="font-bold text-[#f2f2f2] text-xs uppercase tracking-widest">
-              Navigation
+          <div className="space-y-3">
+            <h5 className="font-semibold text-[#f2f2f2] text-xs">
+              Quick Links
             </h5>
             <ul className="space-y-2 text-xs">
               <li>
@@ -35,12 +34,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/analyze" className="hover:text-[#f2f2f2] transition-colors">
-                  Analyze
-                </Link>
-              </li>
-              <li>
-                <Link href="/#awareness" className="hover:text-[#f2f2f2] transition-colors">
-                  Awareness
+                  Scanner
                 </Link>
               </li>
               <li>
@@ -48,43 +42,52 @@ export default function Footer() {
                   Threat Vectors
                 </Link>
               </li>
+              <li>
+                <Link href="/#awareness" className="hover:text-[#f2f2f2] transition-colors">
+                  Directives
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Column 3: Emergency Helpline 1930 / cybercrime.gov.in */}
-          <div className="space-y-4">
-            <h5 className="font-bold text-[#f2f2f2] text-xs uppercase tracking-widest">
-              Official Helpline
+          {/* Column 3: Emergency Helpline 1930 */}
+          <div className="space-y-3">
+            <h5 className="font-semibold text-[#f2f2f2] text-xs">
+              National Helpline
             </h5>
-            <div className="space-y-3">
-              <div className="p-4 bg-[#111111] border border-[#292929] space-y-1">
-                <div className="text-[10px] text-[#888888] uppercase tracking-wider">National Helpline</div>
-                <a href="tel:1930" className="text-lg font-black text-[#b6ff00] hover:text-[#c9ff33] transition-colors block">
-                  1930
-                </a>
-              </div>
+            <div className="space-y-2">
+              <a
+                href="tel:1930"
+                className="flex items-center justify-between p-3 rounded-lg bg-[#0e0e0e] border border-white/5 hover:border-[#b6ff00]/40 transition-colors group"
+              >
+                <div className="flex items-center gap-2">
+                  <PhoneCall className="w-3.5 h-3.5 text-[#b6ff00]" />
+                  <span className="font-semibold text-xs text-[#f2f2f2]">Dial 1930</span>
+                </div>
+                <span className="text-[10px] text-[#666666]">Toll-Free</span>
+              </a>
               <a
                 href="https://cybercrime.gov.in"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between p-4 bg-[#111111] border border-[#292929] hover:border-[#b6ff00] text-[#f2f2f2] transition-colors group"
+                className="flex items-center justify-between p-3 rounded-lg bg-[#0e0e0e] border border-white/5 hover:border-white/15 text-[#f2f2f2] transition-colors group"
               >
-                <span className="font-bold text-xs uppercase tracking-wider">cybercrime.gov.in</span>
-                <ExternalLink className="w-3.5 h-3.5 text-[#888888] group-hover:text-[#b6ff00]" />
+                <span className="text-xs font-medium">cybercrime.gov.in</span>
+                <ExternalLink className="w-3 h-3 text-[#666666] group-hover:text-[#b6ff00]" />
               </a>
             </div>
           </div>
         </div>
 
         {/* Bottom copyright & disclaimer */}
-        <div className="pt-8 border-t border-[#292929] flex flex-col sm:flex-row items-center justify-between gap-4 text-[#666666] text-xs">
-          <p>© {new Date().getFullYear()} SENTINELSHIELD. Financial Security.</p>
-          <div className="flex items-center gap-3">
-            <span>In-memory processing</span>
-            <span>/</span>
+        <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[#666666] text-[11px]">
+          <p>© {new Date().getFullYear()} SentinelShield. Financial Security.</p>
+          <div className="flex items-center gap-2">
+            <span>In-memory evaluation</span>
+            <span>·</span>
             <span>Zero credential storage</span>
-            <span>/</span>
-            <span>Independent verification required</span>
+            <span>·</span>
+            <span>Local heuristics</span>
           </div>
         </div>
       </div>

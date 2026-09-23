@@ -14,7 +14,6 @@ import {
   ArrowRight,
   AlertCircle,
   Link as LinkIcon,
-  FileText,
   Loader2,
   CheckCircle2
 } from 'lucide-react';
@@ -180,36 +179,25 @@ export default function ScreenshotAnalyzer({
   const isBusy = stage !== 'idle' && stage !== 'complete';
 
   return (
-    <div className="w-full space-y-3 font-mono">
+    <div className="w-full space-y-4">
       {/* Sample Presets */}
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-bold text-[#888888] uppercase tracking-wider">Sample Screenshots</span>
-          <span className="text-[#666666] text-[10px]">Click to test</span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          {SAMPLE_SCREENSHOTS.map((preset) => (
-            <button
-              key={preset.id}
-              type="button"
-              onClick={() => handleLoadPreset(preset)}
-              disabled={isBusy}
-              className="p-3 text-left bg-[#111111] hover:bg-[#191919] border border-[#292929] hover:border-[#b6ff00] transition-colors flex items-center justify-between gap-2 cursor-pointer group disabled:opacity-50"
-            >
-              <span className="text-xs font-bold text-[#f2f2f2] uppercase tracking-wider truncate group-hover:text-[#b6ff00] transition-colors">
-                {preset.title}
-              </span>
-              <span className="text-[9px] px-1 py-0.2 uppercase font-bold border bg-[#0a0a0a] text-red-400 border-red-500/50 shrink-0">
-                Sample
-              </span>
-            </button>
-          ))}
-        </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs font-medium text-[#666666] mr-1">Sample Images:</span>
+        {SAMPLE_SCREENSHOTS.map((preset) => (
+          <button
+            key={preset.id}
+            type="button"
+            onClick={() => handleLoadPreset(preset)}
+            disabled={isBusy}
+            className="px-3 py-1.5 rounded-full bg-[#121212] hover:bg-[#1a1a1a] text-xs font-medium text-[#c4c4c4] hover:text-[#f2f2f2] border border-white/5 hover:border-white/15 transition-all cursor-pointer disabled:opacity-50"
+          >
+            {preset.title}
+          </button>
+        ))}
       </div>
 
       {/* Main Container */}
-      <div className="p-5 bg-[#111111] border border-[#292929] space-y-4">
+      <div className="p-6 rounded-2xl bg-[#0e0e0e] border border-white/5 space-y-4">
         <SafetyWarning variant="inline" />
 
         {/* Upload Drop Zone / Image Preview */}
@@ -219,10 +207,10 @@ export default function ScreenshotAnalyzer({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onClick={() => fileInputRef.current?.click()}
-            className={`p-6 sm:p-8 border-2 border-dashed transition-colors flex flex-col items-center justify-center text-center space-y-3 cursor-pointer ${
+            className={`p-8 sm:p-10 rounded-xl border border-dashed transition-all flex flex-col items-center justify-center text-center space-y-3 cursor-pointer ${
               isDragOver
-                ? 'border-[#b6ff00] bg-[#1a1a1a]'
-                : 'border-[#292929] hover:border-[#b6ff00] bg-[#0a0a0a]'
+                ? 'border-[#b6ff00] bg-[#141414]'
+                : 'border-white/10 hover:border-[#b6ff00]/60 bg-[#080808]'
             }`}
           >
             <input
@@ -237,46 +225,46 @@ export default function ScreenshotAnalyzer({
               }}
             />
 
-            <div className="w-10 h-10 bg-[#111111] border border-[#292929] flex items-center justify-center text-[#b6ff00]">
+            <div className="w-10 h-10 rounded-full bg-[#141414] border border-white/10 flex items-center justify-center text-[#b6ff00]">
               <UploadCloud className="w-5 h-5" />
             </div>
 
-            <div className="space-y-0.5">
-              <p className="text-xs sm:text-sm font-bold text-[#f2f2f2] uppercase tracking-wider">
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-[#f2f2f2]">
                 Drop screenshot here, or <span className="text-[#b6ff00] underline">browse</span>
               </p>
-              <p className="text-[11px] text-[#888888]">
+              <p className="text-xs text-[#666666]">
                 PNG, JPG, JPEG, WEBP (Max 10MB)
               </p>
             </div>
           </div>
         ) : (
           <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs border-b border-[#292929] pb-2">
+            <div className="flex items-center justify-between text-xs border-b border-white/5 pb-2.5">
               <div className="flex items-center gap-2">
                 <ImageIcon className="w-4 h-4 text-[#b6ff00]" />
-                <span className="font-bold text-[#f2f2f2] uppercase tracking-wider">{fileName}</span>
+                <span className="font-semibold text-[#f2f2f2]">{fileName}</span>
                 <span className="text-[#666666]">({fileSize})</span>
               </div>
               <button
                 type="button"
                 onClick={handleClear}
                 disabled={isBusy}
-                className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#191919] hover:bg-[#252525] text-[#888888] hover:text-red-400 text-xs border border-[#292929] transition-colors cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#161616] hover:bg-[#222222] text-[#888888] hover:text-red-400 text-xs rounded-full border border-white/5 transition-colors cursor-pointer disabled:opacity-50"
               >
                 <Trash2 className="w-3 h-3" />
                 <span>Remove</span>
               </button>
             </div>
 
-            <div className="bg-[#050505] border border-[#292929] p-2 flex items-center justify-center max-h-64 overflow-hidden">
+            <div className="rounded-xl bg-[#050505] border border-white/5 p-3 flex items-center justify-center max-h-64 overflow-hidden">
               <Image
                 src={imagePreview}
                 alt="Screenshot Preview"
                 width={700}
                 height={350}
                 unoptimized
-                className="max-h-56 w-auto object-contain"
+                className="max-h-56 w-auto object-contain rounded-lg"
               />
             </div>
           </div>
@@ -284,17 +272,17 @@ export default function ScreenshotAnalyzer({
 
         {/* Live Progress Bar */}
         {isBusy && (
-          <div className="p-3 bg-[#0a0a0a] border border-[#292929] space-y-2">
+          <div className="p-3.5 rounded-xl bg-[#080808] border border-white/5 space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold uppercase tracking-wider text-[#f2f2f2] flex items-center gap-2">
+              <span className="font-medium text-[#f2f2f2] flex items-center gap-2">
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-[#b6ff00]" />
                 <span>{progressMessage || 'Processing...'}</span>
               </span>
-              <span className="text-[#b6ff00] font-black">{progressPercent}%</span>
+              <span className="text-[#b6ff00] font-mono font-bold">{progressPercent}%</span>
             </div>
-            <div className="w-full h-1 bg-[#1b1b1b] overflow-hidden">
+            <div className="w-full h-1.5 rounded-full bg-[#1c1c1c] overflow-hidden">
               <div
-                className="h-full bg-[#b6ff00] transition-all duration-300"
+                className="h-full rounded-full bg-[#b6ff00] transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -303,35 +291,32 @@ export default function ScreenshotAnalyzer({
 
         {/* Extracted Text & Detected URLs Preview */}
         {extractedTextPreview && (
-          <div className="p-3.5 bg-[#0a0a0a] border border-[#292929] space-y-2.5">
-            <div className="flex items-center justify-between text-xs border-b border-[#292929] pb-1.5">
-              <div className="flex items-center gap-2 text-[#f2f2f2] font-bold uppercase tracking-wider">
-                <FileText className="w-3.5 h-3.5 text-[#b6ff00]" />
-                <span>Extracted Text ({extractedTextPreview.length} chars)</span>
-              </div>
-              <span className="text-[#666666] text-[10px]">TESSERACT OCR</span>
+          <div className="p-4 rounded-xl bg-[#080808] border border-white/5 space-y-2">
+            <div className="flex items-center justify-between text-xs border-b border-white/5 pb-2">
+              <span className="font-semibold text-[#f2f2f2]">
+                Extracted Text ({extractedTextPreview.length} chars)
+              </span>
+              <span className="text-[10px] text-[#666666] font-mono">OCR ENGINE</span>
             </div>
 
-            <pre className="text-xs text-[#d1d1d1] leading-relaxed whitespace-pre-wrap font-mono max-h-28 overflow-y-auto">
+            <pre className="text-xs text-[#a3a3a3] leading-relaxed whitespace-pre-wrap font-mono max-h-24 overflow-y-auto">
               {extractedTextPreview}
             </pre>
 
             {detectedUrls.length > 0 && (
-              <div className="pt-2 border-t border-[#292929] space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#f2f2f2]">
-                  <LinkIcon className="w-3.5 h-3.5 text-[#b6ff00]" />
-                  <span>Detected Links:</span>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {detectedUrls.map((url, i) => (
-                    <code
-                      key={i}
-                      className="px-1.5 py-0.5 bg-[#111111] border border-red-500/50 text-red-400 text-xs"
-                    >
-                      {url}
-                    </code>
-                  ))}
-                </div>
+              <div className="pt-2 border-t border-white/5 flex flex-wrap items-center gap-1.5">
+                <span className="text-[10px] text-[#666666] font-medium flex items-center gap-1">
+                  <LinkIcon className="w-3 h-3 text-[#b6ff00]" />
+                  <span>Links:</span>
+                </span>
+                {detectedUrls.map((url, i) => (
+                  <code
+                    key={i}
+                    className="px-2 py-0.5 rounded bg-[#141414] border border-red-500/30 text-red-400 text-xs font-mono"
+                  >
+                    {url}
+                  </code>
+                ))}
               </div>
             )}
           </div>
@@ -339,7 +324,7 @@ export default function ScreenshotAnalyzer({
 
         {/* Error State */}
         {error && (
-          <div className="flex items-center gap-2 p-2.5 bg-[#0a0a0a] border border-red-500/50 text-red-400 text-xs">
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-red-950/20 border border-red-500/30 text-red-400 text-xs">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -347,17 +332,17 @@ export default function ScreenshotAnalyzer({
 
         {/* Action Controls */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
-          <span className="text-[11px] text-[#666666]">
-            In-memory OCR. Zero credential retention.
+          <span className="text-xs text-[#666666]">
+            In-memory OCR · Zero credential retention
           </span>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
             {imagePreview && (
               <button
                 type="button"
                 onClick={handleClear}
                 disabled={isBusy}
-                className="px-3.5 py-2 bg-[#191919] hover:bg-[#252525] text-[#f2f2f2] text-xs font-bold uppercase tracking-wider border border-[#292929] transition-colors disabled:opacity-50 cursor-pointer"
+                className="px-4 py-2 rounded-full bg-[#141414] hover:bg-[#1f1f1f] text-[#f2f2f2] text-xs font-semibold border border-white/10 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 Clear
               </button>
@@ -368,7 +353,7 @@ export default function ScreenshotAnalyzer({
               type="button"
               onClick={handleAnalyze}
               disabled={isBusy || !imagePreview}
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2 bg-[#b6ff00] hover:bg-[#c9ff33] text-[#050505] text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-[#b6ff00] hover:bg-[#c9ff33] text-[#050505] text-xs sm:text-sm font-bold rounded-full transition-all hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               {isBusy ? (
                 <>
