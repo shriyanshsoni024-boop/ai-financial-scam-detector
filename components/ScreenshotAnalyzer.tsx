@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { extractTextFromImage, validateImageFile } from '@/lib/ocr/extractText';
 import { analyzeScam } from '@/lib/engine/analyzer';
 import { SAMPLE_SCREENSHOTS, SampleScreenshotPreset, createSampleScreenshotDataUrl } from '@/lib/sample-data';
+import { saveScanToHistory } from '@/lib/history';
 import { AnalysisResult } from '@/types/scam';
 import {
   UploadCloud,
@@ -157,6 +158,7 @@ export default function ScreenshotAnalyzer({
 
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('last_scam_analysis', JSON.stringify(enrichedResult));
+        saveScanToHistory(enrichedResult);
       }
 
       if (onAnalysisComplete) {

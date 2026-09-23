@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { analyzeUrl, validateAndNormalizeUrl } from '@/lib/url/urlAnalyzer';
+import { saveScanToHistory } from '@/lib/history';
 import { AnalysisResult } from '@/types/scam';
 import {
   Loader2,
@@ -81,6 +82,7 @@ export default function UrlAnalyzer({
 
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('last_scam_analysis', JSON.stringify(result));
+        saveScanToHistory(result);
       }
 
       if (onAnalysisComplete) {

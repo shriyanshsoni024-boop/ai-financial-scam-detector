@@ -38,6 +38,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/dashboard" className="hover:text-[#f2f2f2] transition-colors">
+                  Dashboard
+                </Link>
+              </li>
+              <li>
                 <Link href="/#threat-vectors" className="hover:text-[#f2f2f2] transition-colors">
                   Threat Vectors
                 </Link>

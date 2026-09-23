@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { analyzeScam } from '@/lib/engine/analyzer';
 import { SAMPLE_TEST_CASES } from '@/lib/sample-data';
+import { saveScanToHistory } from '@/lib/history';
 import { AnalysisResult, SampleTestCase } from '@/types/scam';
 import {
   Loader2,
@@ -52,6 +53,7 @@ export default function TextAnalyzer({
 
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('last_scam_analysis', JSON.stringify(result));
+        saveScanToHistory(result);
       }
 
       if (onAnalysisComplete) {

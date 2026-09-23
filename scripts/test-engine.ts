@@ -179,12 +179,38 @@ async function runTests() {
     process.exit(1);
   }
 
+  // Test History & Dashboard Telemetry
+  console.log('=== TESTING SCAN HISTORY & DASHBOARD TELEMETRY ===\n');
+  const { getHistoryStats, INITIAL_SAMPLE_SCANS, formatScanDate } = await import('../lib/history');
+
+  const historyStats = getHistoryStats(INITIAL_SAMPLE_SCANS);
+  console.log(`- Sample Scans Count: ${INITIAL_SAMPLE_SCANS.length}`);
+  console.log(`- Computed Stats: Total=${historyStats.total}, HighRisk=${historyStats.highRisk}, NeedsCaution=${historyStats.needsCaution}, LowConcern=${historyStats.lowConcern}`);
+
+  let historyPassed = true;
+  if (historyStats.total !== 4 || historyStats.highRisk !== 3 || historyStats.lowConcern !== 1) {
+    console.error('  ❌ History stats computation mismatch');
+    historyPassed = false;
+  } else {
+    console.log('  ✅ HISTORY STATS COMPUTATION PASSED');
+  }
+
+  const sampleDateFormatted = formatScanDate(new Date(Date.now() - 1000 * 60 * 10).toISOString());
+  console.log(`- Relative Date Format (10m ago): "${sampleDateFormatted}"`);
+  if (sampleDateFormatted === '10m ago') {
+    console.log('  ✅ DATE FORMATTING UTILITY PASSED\n');
+  } else {
+    console.error(`  ❌ Date format unexpected: ${sampleDateFormatted}`);
+    historyPassed = false;
+  }
+
   console.log(`\nOverall Test Results:`);
   console.log(`- Text Engine: ${passed}/${total} passed`);
   console.log(`- URL Engine: ${urlPassed}/${urlTestCases.length} passed`);
+  console.log(`- History & Dashboard Engine: ${historyPassed ? '1/1 passed' : '0/1 passed'}`);
 
-  if (passed === total && urlPassed === urlTestCases.length) {
-    console.log('\n🎉 ALL ENGINE, OCR, AND URL ANALYSIS TESTS PASSED SUCCESSFULLY!');
+  if (passed === total && urlPassed === urlTestCases.length && historyPassed) {
+    console.log('\n🎉 ALL ENGINE, OCR, URL, AND DASHBOARD HISTORY TESTS PASSED SUCCESSFULLY!');
   } else {
     process.exit(1);
   }

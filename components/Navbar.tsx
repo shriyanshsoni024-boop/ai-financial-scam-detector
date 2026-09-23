@@ -22,6 +22,9 @@ export default function Navbar() {
           <Link href="/analyze" className="hover:text-[#f2f2f2] transition-colors">
             Analyze
           </Link>
+          <Link href="/dashboard" className="hover:text-[#f2f2f2] transition-colors">
+            Dashboard
+          </Link>
           <Link href="/#threat-vectors" className="hover:text-[#f2f2f2] transition-colors">
             Threat Vectors
           </Link>
