@@ -1,7 +1,8 @@
 import { AnalysisResult } from '@/types/scam';
 
-export const HISTORY_STORAGE_KEY = 'sentinelshield_scan_history';
-export const HISTORY_INIT_KEY = 'sentinelshield_history_initialized';
+export const HISTORY_STORAGE_KEY = 'scamshield_scan_history';
+export const HISTORY_INIT_KEY = 'scamshield_history_initialized';
+export const LEGACY_STORAGE_KEY = 'sentinelshield_scan_history';
 
 export interface HistoryStats {
   total: number;
@@ -187,8 +188,17 @@ export function getScanHistory(): AnalysisResult[] {
   }
 
   try {
-    const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+    let raw = localStorage.getItem(HISTORY_STORAGE_KEY);
     const hasInitialized = localStorage.getItem(HISTORY_INIT_KEY);
+
+    if (!raw) {
+      // Check legacy storage
+      const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacyRaw) {
+        raw = legacyRaw;
+        localStorage.setItem(HISTORY_STORAGE_KEY, legacyRaw);
+      }
+    }
 
     if (raw === null && !hasInitialized) {
       // First visit: seed default samples
