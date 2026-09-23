@@ -2,7 +2,7 @@ import Analyzer from '@/components/Analyzer';
 import SafetyWarning from '@/components/SafetyWarning';
 
 export const metadata = {
-  title: 'Message Threat Analyzer | SentinelShield',
+  title: 'Message Threat Analyzer | SCAMSHIELD',
   description: 'Evaluate suspicious SMS, email, or UPI payment alerts for heuristic fraud risk indicators.'
 };
 

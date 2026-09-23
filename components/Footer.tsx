@@ -13,7 +13,7 @@ export default function Footer() {
                 <Shield className="w-3.5 h-3.5 fill-[#b6ff00]/20" />
               </div>
               <span className="font-bold text-sm tracking-tight text-[#f2f2f2]">
-                SentinelShield
+                SCAMSHIELD
               </span>
             </div>
             <p className="text-xs text-[#888888] max-w-sm leading-relaxed">
@@ -43,13 +43,13 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/#threat-vectors" className="hover:text-[#f2f2f2] transition-colors">
+                <Link href="/threat-vectors" className="hover:text-[#f2f2f2] transition-colors">
                   Threat Vectors
                 </Link>
               </li>
               <li>
-                <Link href="/#awareness" className="hover:text-[#f2f2f2] transition-colors">
-                  Directives
+                <Link href="/awareness" className="hover:text-[#f2f2f2] transition-colors">
+                  Awareness Directives
                 </Link>
               </li>
             </ul>
@@ -86,7 +86,7 @@ export default function Footer() {
 
         {/* Bottom copyright & disclaimer */}
         <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[#666666] text-[11px]">
-          <p>© {new Date().getFullYear()} SentinelShield. Financial Security.</p>
+          <p>© {new Date().getFullYear()} SCAMSHIELD. Financial Security.</p>
           <div className="flex items-center gap-2">
             <span>In-memory evaluation</span>
             <span>·</span>

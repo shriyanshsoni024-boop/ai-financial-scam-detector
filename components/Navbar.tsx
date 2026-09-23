@@ -13,7 +13,7 @@ export default function Navbar() {
             <Shield className="w-4 h-4 fill-[#b6ff00]/20" />
           </div>
           <span className="font-bold text-base tracking-tight text-[#f2f2f2] group-hover:text-white transition-colors">
-            SentinelShield
+            SCAMSHIELD
           </span>
         </Link>
 
@@ -25,11 +25,11 @@ export default function Navbar() {
           <Link href="/dashboard" className="hover:text-[#f2f2f2] transition-colors">
             Dashboard
           </Link>
-          <Link href="/#threat-vectors" className="hover:text-[#f2f2f2] transition-colors">
+          <Link href="/threat-vectors" className="hover:text-[#f2f2f2] transition-colors">
             Threat Vectors
           </Link>
-          <Link href="/#awareness" className="hover:text-[#f2f2f2] transition-colors">
-            Directives
+          <Link href="/awareness" className="hover:text-[#f2f2f2] transition-colors">
+            Awareness
           </Link>
           <Link href="/#about" className="hover:text-[#f2f2f2] transition-colors">
             Helpline

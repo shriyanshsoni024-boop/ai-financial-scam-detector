@@ -71,7 +71,7 @@ export default function ResultPage() {
 
   const handleShare = () => {
     if (!result) return;
-    const shareText = `⚠️ SentinelShield Threat Assessment\nCategory: ${result.category}\nRisk Level: ${result.riskLevel}\nScore: ${result.riskScore}/100\nSignals: ${result.redFlags.map((f) => f.title).join(', ')}`;
+    const shareText = `⚠️ SCAMSHIELD Threat Assessment\nCategory: ${result.category}\nRisk Level: ${result.riskLevel}\nScore: ${result.riskScore}/100\nSignals: ${result.redFlags.map((f) => f.title).join(', ')}`;
     navigator.clipboard.writeText(shareText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);

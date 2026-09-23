@@ -137,7 +137,7 @@ export function createSampleScreenshotDataUrl(preset: SampleScreenshotPreset): s
     // Header text
     ctx.fillStyle = '#b6ff00';
     ctx.font = 'bold 14px monospace';
-    ctx.fillText('SENTINELSHIELD / SUSPICIOUS SCREENSHOT SAMPLE', 24, 38);
+    ctx.fillText('SCAMSHIELD / SUSPICIOUS SCREENSHOT SAMPLE', 24, 38);
 
     // Message Container
     ctx.fillStyle = '#111111';

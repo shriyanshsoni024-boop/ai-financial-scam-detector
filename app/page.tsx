@@ -1,6 +1,5 @@
-'use client';
-
-import { ShieldAlert, PhoneCall, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
+import { ShieldAlert, PhoneCall, ExternalLink, ArrowRight } from 'lucide-react';
 import Hero from '@/components/Hero';
 import Analyzer from '@/components/Analyzer';
 
@@ -54,13 +53,22 @@ export default function HomePage() {
 
       {/* 3. RECOGNIZED FRAUD PATTERNS */}
       <section id="threat-vectors" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="space-y-1">
-          <span className="text-xs font-semibold text-[#b6ff00] uppercase tracking-wider">
-            Threat Vectors
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#f2f2f2] tracking-tight">
-            Recognized Fraud Signatures
-          </h2>
+        <div className="flex items-end justify-between">
+          <div className="space-y-1">
+            <span className="text-xs font-semibold text-[#b6ff00] uppercase tracking-wider">
+              Threat Vectors
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#f2f2f2] tracking-tight">
+              Recognized Fraud Signatures
+            </h2>
+          </div>
+          <Link
+            href="/threat-vectors"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-[#888888] hover:text-[#b6ff00] transition-colors"
+          >
+            <span>All Threat Vectors</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -82,13 +90,22 @@ export default function HomePage() {
 
       {/* 4. CORE SAFETY DIRECTIVES */}
       <section id="awareness" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="space-y-1">
-          <span className="text-xs font-semibold text-[#b6ff00] uppercase tracking-wider">
-            Best Practices
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#f2f2f2] tracking-tight">
-            Core Security Directives
-          </h2>
+        <div className="flex items-end justify-between">
+          <div className="space-y-1">
+            <span className="text-xs font-semibold text-[#b6ff00] uppercase tracking-wider">
+              Best Practices
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#f2f2f2] tracking-tight">
+              Core Security Directives
+            </h2>
+          </div>
+          <Link
+            href="/awareness"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-[#888888] hover:text-[#b6ff00] transition-colors"
+          >
+            <span>All Directives</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

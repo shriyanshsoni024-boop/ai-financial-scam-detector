@@ -4,7 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'SentinelShield | AI Financial Scam Detector',
+  title: 'SCAMSHIELD | AI Financial Scam Detector',
   description:
     'Identify fake KYC threats, bank impersonation, UPI fraud, and phishing messages before you click or share OTPs. Heuristic-backed explainable risk analysis.',
   keywords: [
