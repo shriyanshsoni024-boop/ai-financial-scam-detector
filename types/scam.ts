@@ -66,6 +66,28 @@ export interface UrlAnalysisDetails {
   keySignals: string[];
 }
 
+export interface AIAnalysisResponse {
+  scamCategory: ScamCategory | string;
+  riskLevel: RiskLevel;
+  confidence: number;
+  summary: string;
+  redFlags: string[];
+  recommendedActions: string[];
+}
+
+export interface AIAnalysisDetails {
+  enabled: boolean;
+  scamCategory?: ScamCategory | string;
+  riskLevel?: RiskLevel;
+  confidence?: number;
+  summary?: string;
+  redFlags?: string[];
+  recommendedActions?: string[];
+  model?: string;
+  latencyMs?: number;
+  error?: string;
+}
+
 export interface AnalysisResult {
   id: string;
   riskLevel: RiskLevel;
@@ -83,6 +105,8 @@ export interface AnalysisResult {
   screenshotUrl?: string;
   detectedUrls?: string[];
   urlDetails?: UrlAnalysisDetails;
+  aiAnalysis?: AIAnalysisDetails;
+  analysisMode?: 'heuristic' | 'ai_assisted' | 'hybrid';
 }
 
 export interface OCRResult {

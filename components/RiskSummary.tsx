@@ -1,5 +1,6 @@
 import { AnalysisResult } from '@/types/scam';
 import RiskBadge from './RiskBadge';
+import { Sparkles, ShieldCheck } from 'lucide-react';
 
 interface RiskSummaryProps {
   result: AnalysisResult;
@@ -28,12 +29,30 @@ export default function RiskSummary({ result }: RiskSummaryProps) {
     }
   };
 
+  const isAiAssisted = result.aiAnalysis?.enabled;
+
   return (
     <div className={`p-6 sm:p-7 rounded-xl bg-[#0e0e0e] border ${getRiskBorderColor()} space-y-5`}>
       {/* Assessment Header */}
       <div className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <RiskBadge level={result.riskLevel} size="md" />
+          <div className="flex items-center gap-2">
+            <RiskBadge level={result.riskLevel} size="md" />
+
+            {/* Subtle AI / Heuristic indicator */}
+            {isAiAssisted ? (
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#141414] border border-[#b6ff00]/30 text-[11px] font-mono text-[#b6ff00]">
+                <Sparkles className="w-3 h-3 text-[#b6ff00]" />
+                <span>AI-assisted assessment ({result.aiAnalysis?.confidence}% confidence)</span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#141414] border border-white/5 text-[11px] font-mono text-[#888888]">
+                <ShieldCheck className="w-3 h-3 text-[#888888]" />
+                <span>Heuristic evaluation</span>
+              </div>
+            )}
+          </div>
+
           <span className="text-xs font-mono text-[#666666]">
             Score: <strong className="text-[#f2f2f2]">{result.riskScore}/100</strong>
           </span>

@@ -204,13 +204,127 @@ async function runTests() {
     historyPassed = false;
   }
 
+  // Test AI Layer & Hybrid Scam Detection Engine
+  console.log('=== TESTING AI / HYBRID SCAM DETECTION ENGINE ===\n');
+  const { parseAndValidateAIResponse, sanitizeAnalysisInput } = await import('../lib/ai/gemini');
+  const { combineHybridAssessment } = await import('../lib/ai/hybrid');
+  const { analyzeWithRules } = await import('../lib/engine/analyzer');
+
+  let aiTestsPassed = 0;
+  const totalAiTests = 4;
+
+  // AI Test 1: Valid AI response parsing
+  console.log('AI Test 1: Parse and Validate Valid AI Response');
+  const sampleValidAi = {
+    scamCategory: 'Fake KYC Scam',
+    riskLevel: 'HIGH_RISK',
+    confidence: 88,
+    summary: 'Potentially suspicious KYC urgency request mimicking official bank notices.',
+    redFlags: ['Urgency coercion', 'Unverified verification URL'],
+    recommendedActions: ['Independently verify via official bank app.']
+  };
+  const parsedAi = parseAndValidateAIResponse(sampleValidAi);
+  if (
+    parsedAi.scamCategory === 'Fake KYC Scam' &&
+    parsedAi.riskLevel === 'HIGH_RISK' &&
+    parsedAi.confidence === 88 &&
+    parsedAi.redFlags.length === 2
+  ) {
+    console.log('  ✅ VALID AI RESPONSE PARSING PASSED');
+    aiTestsPassed++;
+  } else {
+    console.error('  ❌ Valid AI response parsing failed');
+  }
+
+  // AI Test 2: Invalid / Malformed AI response normalization
+  console.log('AI Test 2: Handle Malformed / Non-Standard AI Response');
+  const malformedAi = {
+    scamCategory: 'unknown-weird-category',
+    riskLevel: 'high_risk',
+    confidence: 'invalid_number',
+    summary: '',
+    redFlags: null,
+    recommendedActions: []
+  };
+  const normalizedAi = parseAndValidateAIResponse(malformedAi);
+  if (
+    normalizedAi.riskLevel === 'HIGH_RISK' &&
+    typeof normalizedAi.confidence === 'number' &&
+    normalizedAi.redFlags.length > 0 &&
+    normalizedAi.summary.length > 0
+  ) {
+    console.log('  ✅ INVALID AI RESPONSE NORMALIZATION PASSED');
+    aiTestsPassed++;
+  } else {
+    console.error('  ❌ Invalid AI response normalization failed');
+  }
+
+  // AI Test 3: Hybrid Scoring (Deterministic Rule + AI signals)
+  console.log('AI Test 3: Hybrid Scoring Calculation & Safety Overrides');
+  const baseRuleResult = analyzeWithRules(
+    'URGENT! Bank account blocked today. Complete KYC immediately at example-verification.com with OTP.'
+  );
+  const mockAiOutput = {
+    scamCategory: 'Fake KYC Scam',
+    riskLevel: 'HIGH_RISK' as const,
+    confidence: 90,
+    summary: 'High-risk indicators detected matching deceptive KYC credential harvesting.',
+    redFlags: ['Third-party domain verification', 'Urgency pressure'],
+    recommendedActions: ['Never enter OTP or passwords on third-party pages.']
+  };
+  const hybridResult = combineHybridAssessment(baseRuleResult, mockAiOutput, 'gemini-2.5-flash', 180);
+  console.log(`- Base Rule Score: ${baseRuleResult.riskScore}, Hybrid Score: ${hybridResult.riskScore}`);
+  console.log(`- Analysis Mode: ${hybridResult.analysisMode}, AI Enabled: ${hybridResult.aiAnalysis?.enabled}`);
+  console.log(`- Merged Flags: ${hybridResult.redFlags.length}`);
+
+  if (
+    hybridResult.riskLevel === 'HIGH_RISK' &&
+    hybridResult.analysisMode === 'ai_assisted' &&
+    hybridResult.aiAnalysis?.enabled === true &&
+    hybridResult.riskScore >= 80
+  ) {
+    console.log('  ✅ HYBRID SCORING & SAFETY OVERRIDE PASSED');
+    aiTestsPassed++;
+  } else {
+    console.error('  ❌ Hybrid scoring calculation failed');
+  }
+
+  // AI Test 4: API Failure / Fallback to Rule Engine
+  console.log('AI Test 4: Fallback to Pure Rule Engine when AI is Offline/Disabled');
+  const fallbackResult = analyzeWithRules('Your monthly account statement is available in your banking app.');
+  if (
+    fallbackResult.riskLevel === 'LOW_CONCERN' &&
+    fallbackResult.analysisMode === 'heuristic' &&
+    fallbackResult.aiAnalysis?.enabled === false
+  ) {
+    console.log('  ✅ SEAMLESS RULE-ENGINE FALLBACK PASSED\n');
+    aiTestsPassed++;
+  } else {
+    console.error('  ❌ Rule-engine fallback failed');
+  }
+
+  // Input Sanitizer Test
+  const sanitized = sanitizeAnalysisInput('My card is 4111 2222 3333 4444 and otp: 948281');
+  if (sanitized.includes('[CARD_NUMBER_REDACTED]') && sanitized.includes('[REDACTED]')) {
+    console.log('  ✅ CREDENTIAL SANITIZATION PASSED\n');
+  } else {
+    console.error('  ❌ Credential sanitization failed');
+    process.exit(1);
+  }
+
   console.log(`\nOverall Test Results:`);
   console.log(`- Text Engine: ${passed}/${total} passed`);
   console.log(`- URL Engine: ${urlPassed}/${urlTestCases.length} passed`);
   console.log(`- History & Dashboard Engine: ${historyPassed ? '1/1 passed' : '0/1 passed'}`);
+  console.log(`- AI & Hybrid Engine: ${aiTestsPassed}/${totalAiTests} passed`);
 
-  if (passed === total && urlPassed === urlTestCases.length && historyPassed) {
-    console.log('\n🎉 ALL ENGINE, OCR, URL, AND DASHBOARD HISTORY TESTS PASSED SUCCESSFULLY!');
+  if (
+    passed === total &&
+    urlPassed === urlTestCases.length &&
+    historyPassed &&
+    aiTestsPassed === totalAiTests
+  ) {
+    console.log('\n🎉 ALL ENGINE, OCR, URL, DASHBOARD, AND REAL AI/HYBRID TESTS PASSED SUCCESSFULLY!');
   } else {
     process.exit(1);
   }

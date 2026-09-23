@@ -1,84 +1,146 @@
 import { AnalysisResult, RiskLevel, ScamCategory, RedFlag } from '@/types/scam';
 import { extractRedFlags, classifyScamCategory } from './rules';
+import { combineHybridAssessment } from '@/lib/ai/hybrid';
 
-export interface ScamAnalyzerService {
-  analyze(text: string): Promise<AnalysisResult>;
+/**
+ * Pure deterministic rule-based evaluation.
+ * Always fast, deterministic, and serves as the rock-solid baseline.
+ */
+export function analyzeWithRules(text: string): AnalysisResult {
+  const cleanText = text.trim();
+  if (!cleanText) {
+    throw new Error('Please provide text to analyze.');
+  }
+
+  const { redFlags, totalWeight } = extractRedFlags(cleanText);
+  const category = classifyScamCategory(cleanText, redFlags);
+
+  // Calculate normalized risk score between 0 and 100
+  const highSeverityCount = redFlags.filter((f) => f.severity === 'high').length;
+  const mediumSeverityCount = redFlags.filter((f) => f.severity === 'medium').length;
+
+  let riskScore = Math.min(100, Math.round(totalWeight * 1.25));
+
+  // Refine risk score based on high severity flags
+  if (highSeverityCount >= 2) {
+    riskScore = Math.max(riskScore, 85);
+  } else if (highSeverityCount === 1) {
+    riskScore = Math.max(riskScore, 65);
+  } else if (mediumSeverityCount >= 2) {
+    riskScore = Math.max(riskScore, 50);
+  }
+
+  // Determine Risk Level
+  let riskLevel: RiskLevel = 'LOW_CONCERN';
+  if (riskScore >= 65 || highSeverityCount >= 1) {
+    riskLevel = 'HIGH_RISK';
+  } else if (riskScore >= 30 || mediumSeverityCount >= 1) {
+    riskLevel = 'NEEDS_CAUTION';
+  } else {
+    riskLevel = 'LOW_CONCERN';
+    riskScore = Math.max(5, Math.min(25, riskScore));
+  }
+
+  // Calculate Heuristic Confidence Score (percentage)
+  let confidence = 88;
+  if (riskLevel === 'HIGH_RISK') {
+    confidence = Math.min(98, 85 + redFlags.length * 3);
+  } else if (riskLevel === 'LOW_CONCERN') {
+    confidence = 91;
+  } else {
+    confidence = 82;
+  }
+
+  // Generate Explanations & Summary
+  const { summary, explanation } = generateAnalysisNarrative(riskLevel, category, redFlags);
+
+  // Generate Actionable Advice
+  const recommendedActions = generateRecommendedActions(riskLevel, category, redFlags);
+  const avoidActions = generateAvoidActions(riskLevel, category, redFlags);
+
+  return {
+    id: `scam-analysis-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+    riskLevel,
+    riskScore,
+    category,
+    confidence,
+    redFlags,
+    explanation,
+    summary,
+    recommendedActions,
+    avoidActions,
+    analyzedText: cleanText,
+    analyzedAt: new Date().toISOString(),
+    analysisMode: 'heuristic',
+    aiAnalysis: {
+      enabled: false
+    }
+  };
 }
 
-export class MockAIScamAnalyzer implements ScamAnalyzerService {
-  /**
-   * Main analyzer method simulating an AI layer backed by heuristic scam pattern analysis.
-   */
-  async analyze(text: string): Promise<AnalysisResult> {
-    // Simulate brief AI reasoning latency
-    await new Promise((resolve) => setTimeout(resolve, 600));
+/**
+ * Main analysis function:
+ * 1. Runs deterministic rule engine
+ * 2. Attempts real AI evaluation via server API
+ * 3. Combines signals into an explainable hybrid assessment
+ * 4. Gracefully falls back to pure rule engine if AI is unavailable
+ */
+export async function analyzeScam(
+  text: string,
+  detectedUrls: string[] = []
+): Promise<AnalysisResult> {
+  const ruleResult = analyzeWithRules(text);
 
-    const cleanText = text.trim();
-    if (!cleanText) {
-      throw new Error('Please provide text to analyze.');
+  // Client-side browser execution: call /api/analyze route
+  if (typeof window !== 'undefined') {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout
+
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          detectedUrls,
+          ruleContext: {
+            score: ruleResult.riskScore,
+            category: ruleResult.category,
+            flags: ruleResult.redFlags.map((f) => f.title)
+          }
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.ai) {
+          return combineHybridAssessment(ruleResult, data.ai, data.model, data.latencyMs);
+        }
+      }
+    } catch {
+      // Network failure, timeout, or missing key -> seamlessly fallback to rule engine
     }
 
-    const { redFlags, totalWeight } = extractRedFlags(cleanText);
-    const category = classifyScamCategory(cleanText, redFlags);
-
-    // Calculate normalized risk score between 0 and 100
-    const highSeverityCount = redFlags.filter((f) => f.severity === 'high').length;
-    const mediumSeverityCount = redFlags.filter((f) => f.severity === 'medium').length;
-
-    let riskScore = Math.min(100, Math.round(totalWeight * 1.25));
-
-    // Refine risk score based on high severity flags
-    if (highSeverityCount >= 2) {
-      riskScore = Math.max(riskScore, 85);
-    } else if (highSeverityCount === 1) {
-      riskScore = Math.max(riskScore, 65);
-    } else if (mediumSeverityCount >= 2) {
-      riskScore = Math.max(riskScore, 50);
-    }
-
-    // Determine Risk Level
-    let riskLevel: RiskLevel = 'LOW_CONCERN';
-    if (riskScore >= 65 || highSeverityCount >= 1) {
-      riskLevel = 'HIGH_RISK';
-    } else if (riskScore >= 30 || mediumSeverityCount >= 1) {
-      riskLevel = 'NEEDS_CAUTION';
-    } else {
-      riskLevel = 'LOW_CONCERN';
-      riskScore = Math.max(5, Math.min(25, riskScore));
-    }
-
-    // Calculate AI Confidence Score (percentage)
-    let confidence = 88;
-    if (riskLevel === 'HIGH_RISK') {
-      confidence = Math.min(98, 85 + redFlags.length * 3);
-    } else if (riskLevel === 'LOW_CONCERN') {
-      confidence = 91;
-    } else {
-      confidence = 82;
-    }
-
-    // Generate Explanations & Summary
-    const { summary, explanation } = generateAnalysisNarrative(riskLevel, category, redFlags);
-
-    // Generate Actionable Advice
-    const recommendedActions = generateRecommendedActions(riskLevel, category, redFlags);
-    const avoidActions = generateAvoidActions(riskLevel, category, redFlags);
-
-    return {
-      id: `scam-analysis-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
-      riskLevel,
-      riskScore,
-      category,
-      confidence,
-      redFlags,
-      explanation,
-      summary,
-      recommendedActions,
-      avoidActions,
-      analyzedText: cleanText,
-      analyzedAt: new Date().toISOString()
-    };
+    return ruleResult;
   }
+
+  // Server-side / CLI execution
+  const apiKey = process.env.GEMINI_API_KEY || process.env.AI_API_KEY;
+  if (apiKey) {
+    try {
+      const { analyzeWithGemini } = await import('@/lib/ai/gemini');
+      const aiResult = await analyzeWithGemini(text, detectedUrls);
+      return combineHybridAssessment(ruleResult, aiResult.response, aiResult.model, aiResult.latencyMs);
+    } catch {
+      // Fallback
+      return ruleResult;
+    }
+  }
+
+  return ruleResult;
 }
 
 function generateAnalysisNarrative(
@@ -91,7 +153,7 @@ function generateAnalysisNarrative(
 
   if (riskLevel === 'HIGH_RISK') {
     summary = `Multiple high-risk scam indicators detected. This message closely mirrors known patterns of ${category}. Please exercise extreme caution and verify independently before taking any action.`;
-    
+
     explanation.push(
       `Pattern Assessment: The analyzed text exhibits ${redFlags.length} distinctive red flags commonly leveraged by cyber fraudsters to induce panic or offer deceptive incentives.`
     );
@@ -144,11 +206,11 @@ function generateRecommendedActions(riskLevel: RiskLevel, category: ScamCategory
     actions.push('Report the incident to the National Cyber Crime Reporting Portal (cybercrime.gov.in) or dial 1930.');
     actions.push('Contact your bank directly via the official phone number printed on the back of your debit/credit card.');
     actions.push('Block and mark the sender as spam in your messaging app (SMS, WhatsApp, or Email).');
-    
+
     if (flags.some((f) => f.type === 'OTP_REQUEST' || f.type === 'PASSWORD_REQUEST' || f.type === 'PIN_REQUEST')) {
       actions.push('If you already entered credentials, immediately freeze your account/cards via your official banking app and change all passwords.');
     }
-    
+
     if (category === 'UPI / Payment Scam') {
       actions.push('Check your UPI transaction history and report any unauthorized requests on your UPI app (BHIM, GPay, PhonePe, Paytm).');
     }
@@ -187,11 +249,4 @@ function generateAvoidActions(riskLevel: RiskLevel, category: ScamCategory, flag
   }
 
   return avoids;
-}
-
-// Singleton default instance
-const defaultAnalyzer = new MockAIScamAnalyzer();
-
-export async function analyzeScam(text: string): Promise<AnalysisResult> {
-  return defaultAnalyzer.analyze(text);
 }
